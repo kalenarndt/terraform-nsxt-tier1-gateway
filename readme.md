@@ -18,7 +18,7 @@ locals {
 
 # module to configure Tier1 Gateways on a specific Tier 0 
 module "tier1_gateway" {
-  source             = "./modules/tier1-gateway"
+  source             = "github.com/kalenarndt/terraform-nsxt-tier1-gateway"
   tier0_gateway_path = local.tier0_gateway_paths[local.target_tier0_gateway_name]
   tier1_gateways     = local.tier1_gateways
 }
