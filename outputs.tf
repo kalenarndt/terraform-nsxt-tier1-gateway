@@ -1,4 +1,4 @@
-output "tier1_gateways" {
-  value       = local.tier1_gateways_output
-  description = "Tier 1 Gateway output object to use with other modules."
+output "tier1_gateway" {
+  value       = nsxt_policy_tier1_gateway.t1
+  description = "Output of the Tier1 Gateway that was created."
 }

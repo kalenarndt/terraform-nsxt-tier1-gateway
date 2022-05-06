@@ -1,75 +1,18 @@
-# Terraform NSX-T Tier1 Gateway
+# terraform-nsxt-tier1-gateway
 
-This Terraform module creates multiple NSX-T Tier1 Gateways.
-
-## Usage/Examples
-
-The example below imports a yaml file and loops through the configuration as it creates tier1 gateways in the environment. Tier-0 routers are not required and default to null if a target tier-0 router isn't specified for the module call. 
-
-
-```hcl
-# Input Variables
-locals {
-  nsxt_config                        = yamldecode(file("${path.module}/nsxt-config.yaml"))
-  target_tier0_gateway_name          = "t0-ecmp"
-  tier1_gateways                     = local.nsxt_config.tier1_gateways
-}
-
-
-# module to configure Tier1 Gateways on a specific Tier 0 
-module "tier1_gateway" {
-  source             = "github.com/kalenarndt/terraform-nsxt-tier1-gateway"
-  tier0_gateway_path = local.tier0_gateway_paths[local.target_tier0_gateway_name]
-  tier1_gateways     = local.tier1_gateways
-}
-
-
-# Computed Locals
-# modified object outputs from modules to be referenced by others. 
-locals {
-  tier1_gateway_objs                 = module.tier1_gateway.tier1_gateways
-  tier1_gateway_paths                = { for gw_name, gateway in local.tier1_gateway_objs : (gw_name) => gateway.path }
-}
-```
-
-Ensure that you modify the nsxt-config.yaml file to match the objects that you would like to deploy as this is what the module uses to deploy and configure the tier1 gateways.
-
-Place the nsxt-config.yaml file where your main.tf file is in your deployment or modify the usage example for the path to your yaml I
-
-```yaml
-# tier1 gateway section.
-tier1_gateways:
-  t1-ops:
-    display_name: "t1-operations"
-    route_advertisement_types:
-      - "TIER1_STATIC_ROUTES"
-      - "TIER1_CONNECTED"
-    description: Tier1 Gateway for Operations  - Created by Terraform
-```
-
-  
-## License
-
-[MIT](https://choosealicense.com/licenses/mit/)
-
-  
-
-
-
-
-<!-- BEGIN_TF_DOCS -->
+<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >=0.13 |
-| <a name="requirement_nsxt"></a> [nsxt](#requirement\_nsxt) |  >=3.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13.1 |
+| <a name="requirement_nsxt"></a> [nsxt](#requirement\_nsxt) | >=3.2.5 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_nsxt"></a> [nsxt](#provider\_nsxt) |  >=3.0 |
+| <a name="provider_nsxt"></a> [nsxt](#provider\_nsxt) | 3.2.6 |
 
 ## Modules
 
@@ -79,18 +22,22 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [nsxt_policy_tier1_gateway.gateways](https://registry.terraform.io/providers/vmware/nsxt/latest/docs/resources/policy_tier1_gateway) | resource |
+| [nsxt_policy_tier1_gateway.t1](https://registry.terraform.io/providers/vmware/nsxt/latest/docs/resources/policy_tier1_gateway) | resource |
+| [nsxt_policy_edge_cluster.ec](https://registry.terraform.io/providers/vmware/nsxt/latest/docs/data-sources/policy_edge_cluster) | data source |
+| [nsxt_policy_tier0_gateway.t0](https://registry.terraform.io/providers/vmware/nsxt/latest/docs/data-sources/policy_tier0_gateway) | data source |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_tier0_gateway_path"></a> [tier0\_gateway\_path](#input\_tier0\_gateway\_path) | Tier0 Gateway Path from the computed local | `string` | null | yes |
-| <a name="input_tier1_gateways"></a> [tier1\_gateways](#input\_tier1\_gateways) | Tier1 Gateway Configuration from the supplied YAML file | `map(any)` | n/a | yes |
+| <a name="input_edge_cluster_name"></a> [edge\_cluster\_name](#input\_edge\_cluster\_name) | (Optional) Name of the edge cluster that will be used if you are using services. Set services to true if you are specifying an edge cluster | `string` | `""` | no |
+| <a name="input_services"></a> [services](#input\_services) | (Optional) Conditional that allows for an edge cluster to be used with services. Set to true if you are specifying an edge cluster | `bool` | `false` | no |
+| <a name="input_tier0_gateway"></a> [tier0\_gateway](#input\_tier0\_gateway) | (Optional) Name of the Tier0 Gateway that the Tier1 routers will be downlinked to | `string` | `""` | no |
+| <a name="input_tier1_gateway"></a> [tier1\_gateway](#input\_tier1\_gateway) | (Required) Input map for creating the NSXT Tier1 Gateways | <pre>map(object({<br>    description               = optional(string)<br>    failover_mode             = optional(string)<br>    enable_firewall           = optional(bool)<br>    enable_standby_relocation = optional(bool)<br>    pool_allocation           = optional(string)<br>    dhcp_config_path          = optional(string)<br>    route_advertisement_types = optional(list(string))<br>    tags = optional(map(object({<br>      tag   = string<br>      scope = string<br>    })))<br>    route_advertisement_rules = optional(map(object({<br>      name                      = string<br>      action                    = string<br>      subnets                   = list(string)<br>      prefix_operator           = string<br>      route_advertisement_types = list(string)<br>    })))<br>  }))</pre> | n/a | yes |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| <a name="output_tier1_gateways"></a> [tier1\_gateways](#output\_tier1\_gateways) | Tier 1 Gateway output object to use with other modules. |
-<!-- END_TF_DOCS -->
+| <a name="output_tier1_gateway"></a> [tier1\_gateway](#output\_tier1\_gateway) | Output of the Tier1 Gateway that was created. |
+<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
