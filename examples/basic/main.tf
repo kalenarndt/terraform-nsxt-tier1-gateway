@@ -1,5 +1,5 @@
 module "t1_basic" {
-  source        = "../../"
+  source        = "kalenarndt/tier1-gateway/nsxt"
   tier0_gateway = "Provider-LR"                                                             # Provider Tier0 we will be downlinking to
   t1_gateway = {                                                                            # Map Variable we will iterate through to create the Tier 1 Gateways
     t1_general = {                                                                          # Name of the Tier 1 Gateway
@@ -18,7 +18,7 @@ module "t1_basic" {
 }
 
 module "t1_basic_no_downlink" {
-  source = "../../"
+  source = "kalenarndt/tier1-gateway/nsxt"
   t1_gateway = {                                                                            # Map Variable we will iterate through to create the Tier 1 Gateways
     t1_general = {                                                                          # Name of the Tier 1 Gateway
       description               = "Tier1 Router that provides access for general workloads" # Description that will be applied
